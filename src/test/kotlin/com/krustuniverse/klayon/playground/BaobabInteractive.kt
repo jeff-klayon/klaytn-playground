@@ -31,7 +31,7 @@ class BaobabInteractive {
         val value = BigInteger(Utils.convertToPeb(BigDecimal.valueOf(10), Utils.KlayUnit.mKLAY))
 
         val valueTransfer: ValueTransfer = ValueTransfer.Builder()
-                .setKlaytnCall(caver.rpc.getKlay())
+                .setKlaytnCall(caver.rpc.klay)
                 .setFrom(keyring.address)
                 .setTo(user2.walletAddress)
                 .setValue(value)
@@ -45,18 +45,23 @@ class BaobabInteractive {
         val transferResponse = caver.rpc.klay.sendRawTransaction(valueTransfer.rawTransaction).send()
         checkResponse(transferResponse)
 
-        if (transferResponse.hasError()) {
-            throw RuntimeException(transferResponse.error.message)
-        }
-
         //Check transaction receipt.
         val transactionReceipt = PollingTransactionReceiptProcessor(caver, 1000, 15).waitForTransactionReceipt(transferResponse.result)
-        println(transactionReceipt)
 
         val accountAfter = findAccount(user2.walletAddress)
-        println(accountAfter)
 
         assertEquals(accountBefore.balance + value, accountAfter.balance)
+    }
+
+    @Test
+    fun findTransaction() {
+        val txHash = "0x58666cac6068d07667da1aaeb4f8d3d22a0a98841539ed9a299313b3d18f3cba"
+        val txResponse = caver.rpc.klay.getTransactionByHash(txHash).send()
+        checkResponse(txResponse)
+
+        assertEquals(txHash, txResponse.result.hash)
+
+        println(txResponse.result.blockHash)
     }
 
     private fun findAccount(walletAddress: String): KlaytnAccount {
