@@ -60,8 +60,6 @@ class BaobabInteractive {
         checkResponse(txResponse)
 
         assertEquals(txHash, txResponse.result.hash)
-
-        println(txResponse.result.blockHash)
     }
 
     private fun findAccount(walletAddress: String): KlaytnAccount {
